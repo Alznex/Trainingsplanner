@@ -245,6 +245,7 @@ nav button:hover {
 }
 
 .edit-workout-btn,
+.create-workout-btn,
 .delete-workout-btn {
     background: none; /* Entfernt die Standardhintergrundfarbe */
     color: #bbbbbb; /* Einheitliche Textfarbe */
@@ -257,6 +258,7 @@ nav button:hover {
     transition: background-color 0.3s ease, color 0.3s ease; /* Sanfte Übergänge für Hover-Effekte */
 }
 
+.create-workout-btn:hover,
 .edit-workout-btn:hover {
     background-color: #007aff; /* Blaue Farbe für Bearbeiten beim Hover */
     color: white;

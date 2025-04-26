@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayBtn = document.getElementById('today-btn');
     const weekPlanBtn = document.getElementById('week-plan-btn');
     const workoutsBtn = document.getElementById('week-plan-btn'); // Button für die "Workouts"-Übersicht
-    const addBtn = document.getElementById('add-btn'); // Button für "Neues Workout"
+    const addBtn = document.getElementById('create-new-workout-btn'); // Button für "Neues Workout"
     const searchBtn = document.getElementById('search-btn');
     let workouts = loadWorkouts();
     let currentEditIndex = null; // Speichert den Index des Workouts, das bearbeitet wird
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayAllWorkouts() {
         let html = `<h2>Workouts</h2>`;
-        html += `<button id="create-new-workout-btn" class="edit-workout-btn">Neues Workout erstellen</button>`;
+        html += `<button id="create-new-workout-btn" class="create-workout-btn">Neues Workout erstellen</button>`;
     
         if (workouts.length > 0) {
             workouts.forEach((workout, index) => {
@@ -217,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </form>
         `;
         contentDiv.innerHTML = html;
-        setActiveButton('add-btn');
     
         const addWorkoutForm = document.getElementById('add-workout-form');
         const exercisesContainer = document.getElementById('exercises-container');
@@ -326,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
     todayBtn.addEventListener('click', displayToday);
     workoutsBtn.addEventListener('click', displayAllWorkouts); // Geändert zu displayAllWorkouts
     addBtn.addEventListener('click', displayAddWorkoutForm);
-    searchBtn.addEventListener('click', displaySearchForm);
 
     // Initial beim Laden der Seite die "Workouts"-Übersicht anzeigen und Button aktivieren
     displayAllWorkouts();
