@@ -1,0 +1,245 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 0;
+    background-color: #121212; /* Dunkler Hintergrund */
+    color: #ffffff; /* Helle Schriftfarbe */
+    line-height: 1.5;
+}
+
+header {
+    background-color: #1e1e1e; /* Dunkler Header */
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+nav {
+    background-color: #252525; /* Dunklere Navigation */
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-bottom: 1px solid #333;
+}
+
+nav button {
+    background: none;
+    color: #bbbbbb;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+nav button.active {
+    color: #007aff; /* Akzentfarbe für aktiven Button */
+    font-weight: bold;
+}
+
+nav button:hover {
+    color: #cccccc;
+}
+
+#content {
+    padding: 15px;
+}
+
+.workout-day {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.workout-day h2, .workout-day h3 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.exercise {
+    background-color: #1e1e1e; /* Dunklere Boxen für Übungen */
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.exercise-info {
+    flex-grow: 1;
+}
+
+.exercise strong {
+    font-weight: bold;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.exercise span {
+    color: #bbbbbb;
+    font-size: 0.9em;
+}
+
+.search-results ul {
+    list-style: none;
+    padding: 0;
+}
+
+.search-results li {
+    background-color: #1e1e1e;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.add-workout-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.add-workout-form label {
+    color: #bbbbbb;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.add-workout-form input[type="text"],
+.add-workout-form input[type="number"],
+.add-workout-form select {
+    background-color: #252525;
+    color: #ffffff;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.add-workout-form button,
+.edit-workout-form button {
+    background-color: #007aff; /* Blaue Akzentfarbe für Buttons */
+    color: white;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.add-workout-form button:hover,
+.edit-workout-form button:hover {
+    background-color: #005ec4;
+}
+
+.search-results ul {
+    list-style: none;
+    padding: 0;
+}
+
+.search-results li {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.search-results li strong {
+    font-weight: bold;
+}
+
+.sets-table-container {
+    margin-top: 15px;
+}
+
+.sets-table-container h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.sets-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.sets-table-container th, .sets-table-container td {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    text-align: left;
+}
+
+.sets-table-container th {
+    font-weight: bold;
+    color: #bbbbbb;
+}
+
+.sets-table-container input[type="text"],
+.sets-table-container input[type="number"] {
+    width: 80px;
+    padding: 6px;
+    background-color: #252525;
+    color: #ffffff;
+    border: 1px solid #333;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.sets-table-container .add-set-btn,
+.sets-table-container .remove-set-btn,
+.sets-table-container .remove-set-btn-edit {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-right: 5px;
+}
+
+.sets-table-container .remove-set-btn,
+.sets-table-container .remove-set-btn-edit {
+    background-color: #f44336;
+}
+
+.edit-exercise-btn {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.edit-exercise-btn:hover {
+    background-color: #005ec4;
+}
+
+#cancel-edit-btn {
+    background-color: #f44336;
+    margin-top: 10px;
+}
+
+#cancel-edit-btn:hover {
+    background-color: #d32f2f;
+}
