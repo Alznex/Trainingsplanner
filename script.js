@@ -1,12 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const contentDiv = document.getElementById('content');
     const todayBtn = document.getElementById('today-btn');
-    const weekPlanBtn = document.getElementById('week-plan-btn');
     const workoutsBtn = document.getElementById('week-plan-btn'); // Button für die "Workouts"-Übersicht
     const addBtn = document.getElementById('create-new-workout-btn'); // Button für "Neues Workout"
-    const searchBtn = document.getElementById('search-btn');
     let workouts = loadWorkouts();
-    let currentEditIndex = null; // Speichert den Index des Workouts, das bearbeitet wird
 
     function loadWorkouts() {
         const storedWorkouts = localStorage.getItem('workouts');
@@ -22,44 +19,55 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(buttonId).classList.add('active');
     }
 
+    function displayWorkout(workout, index) {
+        let html = `<div class="workout-item">`;
+        html += `<div class="workoutHeader">`
+        html += `<h3>${workout.name}</h3>`;
+        html += `<div>
+                    <button type="button" class="edit-workout-btn" data-index="${index}">Bearbeiten</button>
+                    <button type="button" class="delete-workout-btn" data-index="${index}">Löschen</button>
+                </div>`;
+        html += `</div>`;
+        if (workout.exercises && workout.exercises.length > 0) {
+            workout.exercises.forEach((exercise) => {
+                html += `<div class="exercise">${exercise.name}`;
+                if (exercise.sets && Array.isArray(exercise.sets) && exercise.sets.length > 0) {
+                    html += `<ul>`;
+                    exercise.sets.forEach(set => {
+                        html += `<li>Satz: ${set.setNr || ''}, Gewicht: ${set.weight || ''} kg, Wiederholungen: ${set.reps || ''}</li>`;
+                    });
+                    html += `</ul>
+                        </div>`;
+                } else {
+                    html += `<p>Keine Sätze für diese Übung.</p>`;
+                }
+            });
+        } else {
+            html += `<p>Dieses Workout enthält noch keine Übungen.</p>`;
+        }
+        html += `</div>`;
+    
+        return html
+    }
+
     function displayToday() {
-        const today = new Date().getDay(); // Aktueller Wochentag (0 für Sonntag, ..., 6 für Samstag)
-        const todaysWorkout = workouts.find(workout => workout.scheduledDayOfWeek === today);
-        const weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
-        const dayName = weekdays[today];
-    
-        let html = `<h2>Heute (${dayName})</h2>`;
-    
-        if (todaysWorkout) {
-            html += `<div class="workout-item">`;
-            html += `<h3>${todaysWorkout.name || `Workout für ${dayName}`}</h3>`;
-            if (todaysWorkout.exercises && todaysWorkout.exercises.length > 0) {
-                todaysWorkout.exercises.forEach((exercise) => {
-                    html += `<div class="exercise">
-                        <div class="exercise-info">
-                            <strong>${exercise.name}</strong>`;
-                    if (exercise.sets && Array.isArray(exercise.sets) && exercise.sets.length > 0) {
-                        html += `<ul>`;
-                        exercise.sets.forEach(set => {
-                            html += `<li>Satz: ${set.setNr || ''}, Gewicht: ${set.weight || ''} kg, Wiederholungen: ${set.reps || ''}</li>`;
-                        });
-                        html += `</ul>`;
-                    } else {
-                        html += `<p>Keine Sätze für diese Übung.</p>`;
-                    }
-                    html += `</div>
-                    </div>`;
-                });
-            } else {
-                html += `<p>Für heute sind keine Übungen geplant.</p>`;
-            }
-            html += `</div>`;
+        let html = `<h2>Heute</h2>`;
+        const today = new Date().getDay()-1; // Aktueller Wochentag (0 für Sonntag, ..., 6 für Samstag)
+
+        if (workouts.length > 0) {
+            workouts.forEach((workout, index) => {
+                if (workout.scheduledDayOfWeek == today){
+                    html += displayWorkout(workout, index)
+                }
+            });
         } else {
             html += `<p>Für heute ist kein Workout geplant.</p>`;
         }
     
         contentDiv.innerHTML = html;
         setActiveButton('today-btn');
+        attachEditWorkoutListeners();
+        attachDeleteWorkoutListeners();
     }
 
     function displayAllWorkouts() {
@@ -68,31 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         if (workouts.length > 0) {
             workouts.forEach((workout, index) => {
-                html += `<div class="workout-item">`;
-                html += `<h3>${workout.name || 'Workout'}</h3>`;
-                if (workout.exercises && workout.exercises.length > 0) {
-                    workout.exercises.forEach((exercise, exerciseIndex) => {
-                        html += `<div class="exercise">
-                            <div class="exercise-info">
-                                <strong>${exercise.name}</strong>`;
-                        if (exercise.sets && Array.isArray(exercise.sets) && exercise.sets.length > 0) {
-                            html += `<ul>`;
-                            exercise.sets.forEach(set => {
-                                html += `<li>Satz: ${set.setNr || ''}, Gewicht: ${set.weight || ''} kg, Wiederholungen: ${set.reps || ''}</li>`;
-                            });
-                            html += `</ul>`;
-                        } else {
-                            html += `<p>Keine Sätze für diese Übung.</p>`;
-                        }
-                        html += `</div>
-                            <button type="button" class="edit-workout-btn" data-index="${index}">Bearbeiten</button>
-                            <button type="button" class="delete-workout-btn" data-index="${index}">Löschen</button>
-                        </div>`;
-                    });
-                } else {
-                    html += `<p>Dieses Workout enthält noch keine Übungen.</p>`;
-                }
-                html += `</div>`;
+                html += displayWorkout(workout, index)
             });
         } else {
             html += `<p>Noch keine Workouts gespeichert.</p>`;
@@ -133,8 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayEditWorkoutForm(workoutIndex) {
-        console.log('workoutIndex in displayEditWorkoutForm:', workoutIndex);
-    
         const workoutToEdit = workouts[workoutIndex];
         const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
     
@@ -142,15 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>Workout bearbeiten</h2>
             <form id="edit-workout-form" class="add-workout-form" data-index="${workoutIndex}">
                 <div>
-                    <label for="edit-workout-name-edit">Workout Name:</label>
                     <input type="text" id="edit-workout-name-edit" name="edit-workout-name-edit" value="${workoutToEdit.name || ''}">
-                </div>
-                <div>
-                    <label for="edit-scheduled-day-of-week-edit">Geplanter Wochentag:</label>
                     <select id="edit-scheduled-day-of-week-edit" name="edit-scheduled-day-of-week-edit">`;
         weekdays.forEach((day, index) => {
-            const selected = workoutToEdit.scheduledDayOfWeek === index ? 'selected' : '';
-            html += `<option value="${index}" ${selected}">${day}</option>`;
+            let selected = ""
+            if (workoutToEdit.scheduledDayOfWeek == index){
+                selected = 'selected';
+            }
+            html += `<option value="${index}" ${selected}>${day}</option>`;
         });
         html += `
                     </select>
@@ -177,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const editWorkoutForm = document.getElementById('edit-workout-form');
         const addExerciseBtnEditForm = document.getElementById('add-exercise-btn-edit-form');
         const cancelEditBtn = document.getElementById('cancel-edit-btn');
-        const exercisesContainerEdit = document.getElementById('exercises-container-edit');
     
         if (editWorkoutForm) {
             editWorkoutForm.addEventListener('submit', handleEditWorkoutSubmit);
@@ -190,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-
     function displayAddWorkoutForm() {
         const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
     
@@ -198,11 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>Neues Workout erstellen</h2>
             <form id="add-workout-form" class="add-workout-form">
                 <div>
-                    <label for="workout-name">Workout Name:</label>
-                    <input type="text" id="workout-name" name="workout-name" placeholder="z.B. Oberkörper Training">
-                </div>
-                <div>
-                    <label for="scheduled-day-of-week">Geplanter Wochentag:</label>
+                    <input type="text" id="workout-name" name="workout-name" placeholder="Workoutname">
                     <select id="scheduled-day-of-week" name="scheduled-day-of-week">`;
         weekdays.forEach((day, index) => {
             html += `<option value="${index}">${day}</option>`;
@@ -238,23 +213,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const exerciseDiv = document.createElement('div');
             exerciseDiv.classList.add('exercise-input');
             exerciseDiv.innerHTML = `
-                <h3>Übung ${exerciseIndex + 1}</h3>
-                <label for="exercise-name-${exerciseIndex + 1}">Übungsname:</label>
-                <input type="text" id="exercise-name-${exerciseIndex + 1}" name="exercise-name[]" required>
+                <h3>
+                    <input type="text" id="exercise-name-${exerciseIndex + 1}" name="exercise-name[]" placeholder="Übungsname" required>
+                </h3>
                 <div class="sets-table-container">
-                    <h4>Sätze</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Satz</th>
-                                <th>Gewicht (kg)</th>
-                                <th>Wiederholungen</th>
-                                <th>Aktion</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sets-table-body-${exerciseIndex + 1}">
-                            </tbody>
-                        </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Satz</th>
+                            <th>Gewicht (kg)</th>
+                            <th>Wiederholungen</th>
+                            <th>Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sets-table-body-${exerciseIndex + 1}">
+                        </tbody>
+                    </table>
                         <button type="button" class="add-set-btn" data-exercise-index="${exerciseIndex + 1}">Satz hinzufügen</button>
                     </div>
                 `;
@@ -320,22 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event Listener für die Navigation
-    displayToday();
-    todayBtn.addEventListener('click', displayToday);
-    workoutsBtn.addEventListener('click', displayAllWorkouts); // Geändert zu displayAllWorkouts
-    addBtn.addEventListener('click', displayAddWorkoutForm);
-
-    // Initial beim Laden der Seite die "Workouts"-Übersicht anzeigen und Button aktivieren
-    displayAllWorkouts();
     function createEditExerciseInput(exercise, exerciseIndex) {
         let html = `
             <div class="exercise-input">
-                <h3>Übung ${exerciseIndex + 1}</h3>
-                <label for="edit-exercise-name-${exerciseIndex + 1}">Übungsname:</label>
-                <input type="text" id="edit-exercise-name-${exerciseIndex + 1}" name="edit-exercise-name[]" value="${exercise.name || ''}" required>
+                <h3>
+                    <input type="text" id="edit-exercise-name-${exerciseIndex + 1}" name="edit-exercise-name[]" value="${exercise.name || ''}" required>
+                </h3>
                 <div class="sets-table-container">
-                    <h4>Sätze</h4>
                     <table>
                         <thead>
                             <tr>
@@ -371,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
         return html;
     }
-    
+
     function handleEditWorkoutSubmit(event) {
         event.preventDefault();
         const workoutIndex = parseInt(document.getElementById('edit-workout-form').dataset.index);
@@ -415,11 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
             workouts[workoutIndex].exercises = updatedExercises;
             saveWorkouts();
             displayAllWorkouts();
-        } else {
-            console.error("Workout mit Index", workoutIndex, "nicht gefunden.");
         }
     }
-    
+
     function handleAddExerciseToEditForm() {
         const exercisesContainerEdit = document.getElementById('exercises-container-edit');
         let exerciseCounterEdit = exercisesContainerEdit.querySelectorAll('.exercise-input').length; // Aktuelle Anzahl der Übungen
@@ -448,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    
+
     function createEditExerciseInputTemplate(exerciseIndex) {
         const exerciseDiv = document.createElement('div');
         exerciseDiv.classList.add('exercise-input');
@@ -477,4 +440,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         return exerciseDiv;
     }
+
+    // Event Listener für die Navigation
+    displayToday();
+    todayBtn.addEventListener('click', displayToday);
+    workoutsBtn.addEventListener('click', displayAllWorkouts); // Geändert zu displayAllWorkouts
+    addBtn.addEventListener('click', displayAddWorkoutForm);
 });
