@@ -61,9 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayAllWorkouts() {
-        let html = `<h2>Workouts</h2>`;
-        html += `<button id="create-new-workout-btn" class="create-workout-btn">Neues Workout erstellen</button>`;
-    
+        let html = `<div class="workoutHeader">
+                        <h2>Workouts</h2>
+                        <button id="create-new-workout-btn" class="create-workout-btn">Neues Workout erstellen</button> 
+                    </div>`;
+
         if (workouts.length > 0) {
             workouts.forEach((workout, index) => {
                 html += displayWorkout(workout, index)
@@ -72,13 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<p>Noch keine Workouts gespeichert.</p>`;
         }
         contentDiv.innerHTML = html;
-        setActiveButton('week-plan-btn');
         attachEditWorkoutListeners();
         attachDeleteWorkoutListeners();
     
         const createNewWorkoutBtn = document.getElementById('create-new-workout-btn');
         if (createNewWorkoutBtn) {
-            createNewWorkoutBtn.addEventListener('click', displayAddWorkoutForm);
+            createNewWorkoutBtn.addEventListener('click', displayEditWorkoutForm);
         } else {
             console.error("Das Element mit der ID 'create-new-workout-btn' wurde nicht gefunden.");
         }
@@ -107,14 +108,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayEditWorkoutForm(workoutIndex) {
-        const workoutToEdit = workouts[workoutIndex];
+        let State = true
+        let workoutToEdit
+        if (workoutIndex){
+            workoutToEdit = {name: '', scheduledDayOfWeek: 0, exercises:[{name: '', sets: [{setNr: "1", weight: 0, reps: 0}]}]};
+            State = false
+        }else{
+            workoutToEdit = workouts[workoutIndex];
+        }
         const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
-    
+        
         let html = `
             <h2>Workout bearbeiten</h2>
             <form id="edit-workout-form" class="add-workout-form" data-index="${workoutIndex}">
                 <div>
-                    <input type="text" id="edit-workout-name-edit" name="edit-workout-name-edit" value="${workoutToEdit.name || ''}">
+                    <input type="text" id="edit-workout-name-edit" name="edit-workout-name-edit" placeholder="Workout Name" value="${workoutToEdit.name || ''}">
                     <select id="edit-scheduled-day-of-week-edit" name="edit-scheduled-day-of-week-edit">`;
         weekdays.forEach((day, index) => {
             let selected = ""
@@ -158,11 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        if (addExerciseBtnEditForm) {
+        if (addExerciseBtnEditForm && State == true) {
             addExerciseBtnEditForm.addEventListener('click', handleAddExerciseToEditForm);
+        }else{
+            addExerciseBtnEditForm.addEventListener('click', saveNemWorkout);
         }
-        if (cancelEditBtn) {
+        if (cancelEditBtn && State == false) {
             cancelEditBtn.addEventListener('click', displayAllWorkouts);
+        }else{
+            cancelEditBtn.addEventListener('click', displayToday);
         }
 
         const addSetButtonsEdit = document.querySelectorAll('.add-set-btn-edit');
@@ -188,148 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    function displayAddWorkoutForm() {
-        const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
-    
-        let html = `
-            <h2>Neues Workout erstellen</h2>
-            <form id="add-workout-form" class="add-workout-form">
-                <div>
-                    <input type="text" id="workout-name" name="workout-name" placeholder="Workoutname" required>
-                    <select id="scheduled-day-of-week" name="scheduled-day-of-week">`;
-        weekdays.forEach((day, index) => {
-            html += `<option value="${index}">${day}</option>`;
-        });
-        html += `
-                    </select>
-                </div>
-                <div id="exercises-container">
-                    </div>
-                <button type="button" id="add-exercise-btn">Weitere Übung hinzufügen</button>
-                <button type="submit">Workout speichern</button>
-                <button type="button" id="cancel-edit-btn">Abbrechen</button>
-            </form>
-        `;
-        contentDiv.innerHTML = html;
-    
-        const addWorkoutForm = document.getElementById('add-workout-form');
-        const exercisesContainer = document.getElementById('exercises-container');
-        const addExerciseButton = document.getElementById('add-exercise-btn');
-        const cancelButton = document.getElementById('cancel-edit-btn')
-    
-        let exerciseCounter = 0;
-    
-        const firstExerciseDiv = createExerciseInput(exerciseCounter);
-        exercisesContainer.appendChild(firstExerciseDiv);
-        exerciseCounter++;
-    
-        addExerciseButton.addEventListener('click', () => {
-            const exerciseDiv = createExerciseInput(exerciseCounter);
-            exercisesContainer.appendChild(exerciseDiv);
-            exerciseCounter++;
-        });
-    
-        function createExerciseInput(exerciseIndex) {
-            const exerciseDiv = document.createElement('div');
-            exerciseDiv.classList.add('exercise-input');
-            exerciseDiv.innerHTML = `
-                <h3>
-                    <input type="text" id="exercise-name-${exerciseIndex + 1}" name="exercise-name[]" placeholder="Übungsname" required>
-                </h3>
-                <div class="sets-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Satz</th>
-                            <th>Gewicht (kg)</th>
-                            <th>Reps</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="sets-table-body-${exerciseIndex + 1}">
-                        <tr>
-                            <td><input type="text" name="set-nr-${exerciseIndex + 1}[]" value="1"></td>
-                            <td><input type="number" step="0.01" name="weight-${exerciseIndex + 1}[]" value=""></td>
-                            <td><input type="number" name="reps-${exerciseIndex + 1}[]" value=""></td>
-                            <td><button type="button" class="remove-set-btn"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
-                        </tr>
-                    </tbody>
-                    </table>
-                        <button type="button" class="add-set-btn" data-exercise-index="${exerciseIndex + 1}">Satz hinzufügen</button>
-                    </div>
-                `;
-    
-            const addSetButton = exerciseDiv.querySelector('.add-set-btn');
-            const setsTableBody = exerciseDiv.querySelector(`#sets-table-body-${exerciseIndex + 1}`);
-    
-            addSetButton.addEventListener('click', () => {
-                const newRow = setsTableBody.insertRow();
-                const setCounter = setsTableBody.rows.length;
-                newRow.innerHTML = `
-                    <td><input type="text" name="set-nr-${exerciseIndex + 1}[]" value="${setCounter}"></td>
-                    <td><input type="number" step="0.01" name="weight-${exerciseIndex + 1}[]" value=""></td>
-                    <td><input type="number" name="reps-${exerciseIndex + 1}[]" value=""></td>
-                    <td><button type="button" class="remove-set-btn"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
-                `;
-                const removeButton = newRow.querySelector('.remove-set-btn');
-                removeButton.addEventListener('click', (event) => {
-                    event.target.closest('tr').remove(); // Entferne die Tabellenzeile
-                });
-            });
-
-            
-    
-            return exerciseDiv;
-        }
-
-        cancelButton.addEventListener('click', displayAllWorkouts)
-
-        addWorkoutForm.addEventListener('click', function(event) {
-            if (event.target.classList.contains('remove-set-btn')) {
-                event.target.closest('tr').remove();
-            }
-        });
-        
-        addWorkoutForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const workoutNameInput = document.getElementById('workout-name');
-            const workoutName = workoutNameInput.value.trim();
-            const scheduledDayOfWeekInput = document.getElementById('scheduled-day-of-week');
-            const scheduledDayOfWeek = parseInt(scheduledDayOfWeekInput.value);
-            const exerciseNames = document.querySelectorAll('input[name="exercise-name[]"]');
-            const allExercisesData = [];
-    
-            exerciseNames.forEach((nameInput, exerciseIndex) => {
-                const sets = [];
-                const setNrs = document.querySelectorAll(`input[name="set-nr-${exerciseIndex + 1}[]"]`);
-                const weights = document.querySelectorAll(`input[name="weight-${exerciseIndex + 1}[]"]`);
-                const reps = document.querySelectorAll(`input[name="reps-${exerciseIndex + 1}[]"]`);
-    
-                setNrs.forEach((setNrInput, setIndex) => {
-                    sets.push({
-                        setNr: setNrInput.value,
-                        weight: weights[setIndex].value ? parseFloat(weights[setIndex].value) : null,
-                        reps: reps[setIndex].value ? parseInt(reps[setIndex].value) : null
-                    });
-                });
-    
-                allExercisesData.push({
-                    name: nameInput.value,
-                    sets: sets
-                });
-            });
-    
-            const newWorkout = {
-                name: workoutName,
-                scheduledDayOfWeek: scheduledDayOfWeek, // Speichern des Wochentags als Zahl
-                exercises: allExercisesData
-            };
-            workouts.push(newWorkout);
-            saveWorkouts();
-            displayAllWorkouts();
-        });
-    }
-
     function createEditExerciseInput(exercise, exerciseIndex) {
         let html = `
             <div class="exercise-input">
@@ -415,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             workouts[workoutIndex].scheduledDayOfWeek = scheduledDayOfWeek; // Speichern des bearbeiteten Wochentags
             workouts[workoutIndex].exercises = updatedExercises;
             saveWorkouts();
-            displayAllWorkouts();
+            displayToday();
         }
     }
 
@@ -423,7 +293,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const exercisesContainerEdit = document.getElementById('exercises-container-edit');
         let exerciseCounterEdit = exercisesContainerEdit.querySelectorAll('.exercise-input').length;
         exerciseCounterEdit++;
-        const exerciseDiv = createEditExerciseInputTemplate(exerciseCounterEdit);
+        const exerciseDiv = document.createElement('div');
+        exerciseDiv.classList.add('exercise-input');
+        exerciseDiv.innerHTML = `
+            <h3><input type="text" id="edit-exercise-name-${exerciseCounterEdit}" name="edit-exercise-name[]" placeholder="Übungs Name" required></h3>
+            <div class="sets-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Satz</th>
+                            <th>Gewicht (kg)</th>
+                            <th>Wiederholungen</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="sets-table-body-edit-${exerciseCounterEdit}">
+                    </tbody>
+                </table>
+                <button type="button" class="add-set-btn-edit" data-exercise-index="${exerciseCounterEdit}">Satz hinzufügen</button>
+            </div>
+        `;
         exercisesContainerEdit.appendChild(exerciseDiv);
     
         // Füge Event Listener für "Satz hinzufügen" zum neu erstellten Übungs-Div hinzu
@@ -448,33 +337,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function createEditExerciseInputTemplate(exerciseIndex) {
-        const exerciseDiv = document.createElement('div');
-        exerciseDiv.classList.add('exercise-input');
-        exerciseDiv.innerHTML = `
-            <h3>Übung ${exerciseIndex + 1}</h3>
-            <label for="edit-exercise-name-${exerciseIndex}">Übungsname:</label>
-            <input type="text" id="edit-exercise-name-${exerciseIndex}" name="edit-exercise-name[]" required>
-            <label for="edit-muscle-group-${exerciseIndex}">Muskelgruppe:</label>
-            <input type="text" id="edit-muscle-group-${exerciseIndex}" name="edit-muscle-group[]">
-            <div class="sets-table-container">
-                <h4>Sätze</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Satz</th>
-                            <th>Gewicht (kg)</th>
-                            <th>Wiederholungen</th>
-                            <th>Aktion</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sets-table-body-edit-${exerciseIndex}">
-                    </tbody>
-                </table>
-                <button type="button" class="add-set-btn-edit" data-exercise-index="${exerciseIndex}">Satz hinzufügen</button>
-            </div>
-        `;
-        return exerciseDiv;
+    function saveNemWorkout(event){
+        event.preventDefault();
+        const workoutNameInput = document.getElementById('workout-name');
+        const workoutName = workoutNameInput.value.trim();
+        const scheduledDayOfWeekInput = document.getElementById('scheduled-day-of-week');
+        const scheduledDayOfWeek = parseInt(scheduledDayOfWeekInput.value);
+        const exerciseNames = document.querySelectorAll('input[name="exercise-name[]"]');
+        const allExercisesData = [];
+
+        exerciseNames.forEach((nameInput, exerciseIndex) => {
+            const sets = [];
+            const setNrs = document.querySelectorAll(`input[name="set-nr-${exerciseIndex + 1}[]"]`);
+            const weights = document.querySelectorAll(`input[name="weight-${exerciseIndex + 1}[]"]`);
+            const reps = document.querySelectorAll(`input[name="reps-${exerciseIndex + 1}[]"]`);
+
+            setNrs.forEach((setNrInput, setIndex) => {
+                sets.push({
+                    setNr: setNrInput.value,
+                    weight: weights[setIndex].value ? parseFloat(weights[setIndex].value) : null,
+                    reps: reps[setIndex].value ? parseInt(reps[setIndex].value) : null
+                });
+            });
+
+            allExercisesData.push({
+                name: nameInput.value,
+                sets: sets
+            });
+        });
+
+        const newWorkout = {
+            name: workoutName,
+            scheduledDayOfWeek: scheduledDayOfWeek, // Speichern des Wochentags als Zahl
+            exercises: allExercisesData
+        };
+        workouts.push(newWorkout);
+        saveWorkouts();
+        displayAllWorkouts();
     }
 
     // Event Listener für die Navigation

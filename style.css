@@ -49,7 +49,6 @@ nav button {
 }
 
 nav button.active {
-    color: #007aff; /* Akzentfarbe für aktiven Button */
     font-weight: bold;
 }
 
