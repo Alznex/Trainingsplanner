@@ -24,23 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `<div class="workoutHeader">`
         html += `<h3>${workout.name}</h3>`;
         html += `<div>
-                    <button type="button" class="edit-workout-btn" data-index="${index}">Bearbeiten</button>
+                    <button type="button" class="edit-workout-btn" data-index="${index}">Starten</button>
                     <button type="button" class="delete-workout-btn" data-index="${index}">Löschen</button>
                 </div>`;
         html += `</div>`;
         if (workout.exercises && workout.exercises.length > 0) {
             workout.exercises.forEach((exercise) => {
-                html += `<div class="exercise">${exercise.name}`;
-                if (exercise.sets && Array.isArray(exercise.sets) && exercise.sets.length > 0) {
-                    html += `<ul>`;
-                    exercise.sets.forEach(set => {
-                        html += `<li>Satz: ${set.setNr || ''}, Gewicht: ${set.weight || ''} kg, Wiederholungen: ${set.reps || ''}</li>`;
-                    });
-                    html += `</ul>
-                        </div>`;
-                } else {
-                    html += `<p>Keine Sätze für diese Übung.</p>`;
-                }
+                html += `<div class="exercise">${exercise.name} </div>`;
             });
         } else {
             html += `<p>Dieses Workout enthält noch keine Übungen.</p>`;
@@ -161,6 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
         if (editWorkoutForm) {
             editWorkoutForm.addEventListener('submit', handleEditWorkoutSubmit);
+            // Event Delegation für "Satz entfernen" im Bearbeitungsformular
+            editWorkoutForm.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-set-btn-edit')) {
+                    event.target.closest('tr').remove();
+                }
+            });
         }
         if (addExerciseBtnEditForm) {
             addExerciseBtnEditForm.addEventListener('click', handleAddExerciseToEditForm);
@@ -168,6 +164,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cancelEditBtn) {
             cancelEditBtn.addEventListener('click', displayAllWorkouts);
         }
+
+        const addSetButtonsEdit = document.querySelectorAll('.add-set-btn-edit');
+        addSetButtonsEdit.forEach(button => {
+            button.addEventListener('click', function() {
+                const exerciseIndex = this.dataset.exerciseIndex;
+                const setsTableBodyEdit = document.querySelector(`#sets-table-body-edit-${exerciseIndex}`);
+                if (setsTableBodyEdit) {
+                    const newRow = setsTableBodyEdit.insertRow();
+                    const setCounter = setsTableBodyEdit.rows.length;
+                    newRow.innerHTML = `
+                        <td><input type="text" name="edit-set-nr-${exerciseIndex}[]" value="${setCounter}"></td>
+                        <td><input type="number" step="0.01" name="edit-weight-${exerciseIndex}[]" value=""></td>
+                        <td><input type="number" name="edit-reps-${exerciseIndex}[]" value=""></td>
+                        <td><button type="button" class="remove-set-btn-edit">Entfernen</button></td>
+                    `;
+                    // WICHTIG: Füge auch hier den delegierten Listener für das neu erstellte "Entfernen"-Button hinzu
+                    newRow.querySelector('.remove-set-btn-edit').addEventListener('click', (event) => {
+                        event.target.closest('tr').remove();
+                    });
+                }
+            });
+        });
     }
     
     function displayAddWorkoutForm() {
@@ -177,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>Neues Workout erstellen</h2>
             <form id="add-workout-form" class="add-workout-form">
                 <div>
-                    <input type="text" id="workout-name" name="workout-name" placeholder="Workoutname">
+                    <input type="text" id="workout-name" name="workout-name" placeholder="Workoutname" required>
                     <select id="scheduled-day-of-week" name="scheduled-day-of-week">`;
         weekdays.forEach((day, index) => {
             html += `<option value="${index}">${day}</option>`;
@@ -222,12 +240,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         <tr>
                             <th>Satz</th>
                             <th>Gewicht (kg)</th>
-                            <th>Wiederholungen</th>
-                            <th>Aktion</th>
+                            <th>Reps</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="sets-table-body-${exerciseIndex + 1}">
-                        </tbody>
+                        <tr>
+                            <td><input type="text" name="set-nr-${exerciseIndex + 1}[]" value="1"></td>
+                            <td><input type="number" name="weight-${exerciseIndex + 1}[]" value=""></td>
+                            <td><input type="number" name="reps-${exerciseIndex + 1}[]" value=""></td>
+                            <td><button type="button" class="remove-set-btn"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
+                        </tr>
+                    </tbody>
                     </table>
                         <button type="button" class="add-set-btn" data-exercise-index="${exerciseIndex + 1}">Satz hinzufügen</button>
                     </div>
@@ -243,17 +267,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><input type="text" name="set-nr-${exerciseIndex + 1}[]" value="${setCounter}"></td>
                     <td><input type="number" name="weight-${exerciseIndex + 1}[]" value=""></td>
                     <td><input type="number" name="reps-${exerciseIndex + 1}[]" value=""></td>
-                    <td><button type="button" class="remove-set-btn">Entfernen</button></td>
+                    <td><button type="button" class="remove-set-btn"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
                 `;
                 const removeButton = newRow.querySelector('.remove-set-btn');
                 removeButton.addEventListener('click', (event) => {
-                    event.target.parentNode.parentNode.remove();
+                    event.target.closest('tr').remove(); // Entferne die Tabellenzeile
                 });
             });
+
+            
     
             return exerciseDiv;
         }
-    
+
+        addWorkoutForm.addEventListener('click', function(event) {
+            if (event.target.classList.contains('remove-set-btn')) {
+                event.target.closest('tr').remove();
+            }
+        });
+        
         addWorkoutForm.addEventListener('submit', (event) => {
             event.preventDefault();
             const workoutNameInput = document.getElementById('workout-name');
@@ -306,8 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <tr>
                                 <th>Satz</th>
                                 <th>Gewicht (kg)</th>
-                                <th>Wiederholungen</th>
-                                <th>Aktion</th>
+                                <th>Reps</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="sets-table-body-edit-${exerciseIndex + 1}">
@@ -318,9 +350,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 html += `
                     <tr>
                         <td><input type="text" name="edit-set-nr-${exerciseIndex + 1}[]" value="${set.setNr || setIndex + 1}"></td>
-                        <td><input type="number" name="edit-weight-${exerciseIndex + 1}[]" value="${set.weight || ''}"></td>
+                        <td><input type="number" step="0.01" name="edit-weight-${exerciseIndex + 1}[]" value="${set.weight || ''}"></td>
                         <td><input type="number" name="edit-reps-${exerciseIndex + 1}[]" value="${set.reps || ''}"></td>
-                        <td><button type="button" class="remove-set-btn-edit">Entfernen</button></td>
+                        <td><button type="button" class="remove-set-btn-edit"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
                     </tr>
                 `;
             });
@@ -385,12 +417,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleAddExerciseToEditForm() {
         const exercisesContainerEdit = document.getElementById('exercises-container-edit');
-        let exerciseCounterEdit = exercisesContainerEdit.querySelectorAll('.exercise-input').length; // Aktuelle Anzahl der Übungen
+        let exerciseCounterEdit = exercisesContainerEdit.querySelectorAll('.exercise-input').length;
         exerciseCounterEdit++;
         const exerciseDiv = createEditExerciseInputTemplate(exerciseCounterEdit);
         exercisesContainerEdit.appendChild(exerciseDiv);
     
-        // Füge Event Listener für "Satz hinzufügen" und "Satz entfernen" zu der neuen Übung hinzu
+        // Füge Event Listener für "Satz hinzufügen" zum neu erstellten Übungs-Div hinzu
         const addSetButtonEdit = exerciseDiv.querySelector('.add-set-btn-edit');
         const setsTableBodyEdit = exerciseDiv.querySelector(`#sets-table-body-edit-${exerciseCounterEdit}`);
     
@@ -404,9 +436,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><input type="number" name="edit-reps-${exerciseCounterEdit}[]" value=""></td>
                     <td><button type="button" class="remove-set-btn-edit">Entfernen</button></td>
                 `;
-                const removeButton = newRow.querySelector('.remove-set-btn-edit');
-                removeButton.addEventListener('click', (event) => {
-                    event.target.parentNode.parentNode.remove();
+                // WICHTIG: Füge auch hier den delegierten Listener für das neu erstellte "Entfernen"-Button hinzu
+                newRow.querySelector('.remove-set-btn-edit').addEventListener('click', (event) => {
+                    event.target.closest('tr').remove();
                 });
             });
         }
@@ -444,6 +476,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listener für die Navigation
     displayToday();
     todayBtn.addEventListener('click', displayToday);
-    workoutsBtn.addEventListener('click', displayAllWorkouts); // Geändert zu displayAllWorkouts
-    addBtn.addEventListener('click', displayAddWorkoutForm);
+    workoutsBtn.addEventListener('click', displayAllWorkouts);
 });

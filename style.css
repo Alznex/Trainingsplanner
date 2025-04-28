@@ -21,6 +21,10 @@ h3{
     margin: 0;
 }
 
+.remove-set-btn-edit{
+    margin: -10px -5px 0px 0px;
+}
+
 header h1 {
     margin: 0;
     font-size: 1.2em;
@@ -66,11 +70,6 @@ nav button:hover {
     align-items: center;
 }
 
-.exercise span {
-    color: #bbbbbb;
-    font-size: 0.9em;
-}
-
 .add-workout-form {
     display: flex;
     flex-direction: column;
@@ -113,24 +112,6 @@ nav button:hover {
     background-color: #005ec4;
 }
 
-.sets-table-container {
-    margin-top: 15px;
-}
-
-.sets-table-container h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1em;
-    font-weight: bold;
-    color: #ffffff;
-}
-
-.sets-table-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-}
-
 .sets-table-container th, .sets-table-container td {
     padding: 8px;
     border-bottom: 1px solid #333;
@@ -168,7 +149,12 @@ nav button:hover {
 
 .sets-table-container .remove-set-btn,
 .sets-table-container .remove-set-btn-edit {
-    background-color: #f44336;
+    background-color: transparent;
+}
+
+.svgDelet{
+    height: 1em;
+    fill: #ff0000;
 }
 
 .edit-exercise-btn {
@@ -233,7 +219,8 @@ nav button:hover {
     margin-bottom: .5rem;
 }
 
-.workout-item{
+.workout-item,
+.exercise-input{
     background-color: #121212; /* Dunklere Boxen für Übungen */
     padding: 12px;
     margin-top: .5rem;
@@ -242,4 +229,3 @@ nav button:hover {
     justify-content: space-between;
     align-items: center;
 }
-
