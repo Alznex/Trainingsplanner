@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td><input type="text" name="edit-set-nr-${exerciseIndex}[]" value="${setCounter}"></td>
                         <td><input type="number" step="0.01" name="edit-weight-${exerciseIndex}[]" value=""></td>
                         <td><input type="number" name="edit-reps-${exerciseIndex}[]" value=""></td>
-                        <td><button type="button" class="remove-set-btn-edit">Entfernen</button></td>
+                        <td><button type="button" class="remove-set-btn-edit"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
                     `;
                     // WICHTIG: Füge auch hier den delegierten Listener für das neu erstellte "Entfernen"-Button hinzu
                     newRow.querySelector('.remove-set-btn-edit').addEventListener('click', (event) => {
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td><input type="text" name="edit-set-nr-${exerciseCounterEdit}[]" value="${setCounter}"></td>
                     <td><input type="number" name="edit-weight-${exerciseCounterEdit}[]" value=""></td>
                     <td><input type="number" name="edit-reps-${exerciseCounterEdit}[]" value=""></td>
-                    <td><button type="button" class="remove-set-btn-edit">Entfernen</button></td>
+                    <td><button type="button" class="remove-set-btn-edit"><svg class="svgDelet" viewBox="0 0 2048 2048" focusable="false"><path d="M1792 384h-128v1472q0 40-15 75t-41 61-61 41-75 15H448q-40 0-75-15t-61-41-41-61-15-75V384H128V256h512V128q0-27 10-50t27-40 41-28 50-10h384q27 0 50 10t40 27 28 41 10 50v128h512v128zM768 256h384V128H768v128zm768 128H384v1472q0 26 19 45t45 19h1024q26 0 45-19t19-45V384zM768 1664H640V640h128v1024zm256 0H896V640h128v1024zm256 0h-128V640h128v1024z"></path></svg></button></td>
                 `;
                 // WICHTIG: Füge auch hier den delegierten Listener für das neu erstellte "Entfernen"-Button hinzu
                 newRow.querySelector('.remove-set-btn-edit').addEventListener('click', (event) => {
