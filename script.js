@@ -207,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 <button type="button" id="add-exercise-btn">Weitere Übung hinzufügen</button>
                 <button type="submit">Workout speichern</button>
+                <button type="button" id="cancel-edit-btn">Abbrechen</button>
             </form>
         `;
         contentDiv.innerHTML = html;
@@ -279,6 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
             return exerciseDiv;
         }
+
+        addWorkoutForm.addEventListener('click', displayAllWorkouts)
 
         addWorkoutForm.addEventListener('click', function(event) {
             if (event.target.classList.contains('remove-set-btn')) {
