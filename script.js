@@ -215,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const addWorkoutForm = document.getElementById('add-workout-form');
         const exercisesContainer = document.getElementById('exercises-container');
         const addExerciseButton = document.getElementById('add-exercise-btn');
+        const cancelButton = document.getElementById('cancel-edit-btn')
     
         let exerciseCounter = 0;
     
@@ -281,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return exerciseDiv;
         }
 
-        addWorkoutForm.addEventListener('click', displayAllWorkouts)
+        cancelButton.addEventListener('click', displayAllWorkouts)
 
         addWorkoutForm.addEventListener('click', function(event) {
             if (event.target.classList.contains('remove-set-btn')) {
